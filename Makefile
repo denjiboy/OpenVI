@@ -8,14 +8,18 @@ PREFIX   ?= /usr/local
 BINDIR   ?= $(PREFIX)/bin
 APPDIR   ?= $(PREFIX)/share/applications
 
-SRC      := src/rpf.c src/wbc.c src/game.c src/main.c
-HDR      := src/rpf.h src/wbc.h src/wbc_net.h src/game.h
+SRC      := $(wildcard src/*.c)
+HDR      := $(wildcard src/*.h)
+OBJ      := $(SRC:.c=.o)
 BIN      := openiv-native
 
 all: $(BIN)
 
-$(BIN): $(SRC) $(HDR)
-	$(CC) $(CFLAGS) -o $@ $(SRC) $(LDLIBS)
+$(BIN): $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LDLIBS)
+
+%.o: %.c $(HDR)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 run: $(BIN)
 	./$(BIN)
@@ -29,6 +33,6 @@ uninstall:
 	rm -f $(DESTDIR)$(APPDIR)/$(BIN).desktop
 
 clean:
-	rm -f $(BIN)
+	rm -f $(BIN) $(OBJ)
 
 .PHONY: all run install uninstall clean
